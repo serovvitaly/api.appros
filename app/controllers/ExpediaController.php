@@ -1,12 +1,10 @@
 <?php
 
-class ExpediaController extends Controller {   
+class ExpediaController extends Controller {
     
     
-    public function before()
+    public function __construct()
     {        
-        parent::before();
-        
         Expedia::set('cid', '55505')
                ->set('apiKey', '9j5yzzmywf936na49yjc66t4')
                ->set('locale', 'ru_RU')
@@ -33,6 +31,10 @@ class ExpediaController extends Controller {
         
         $filter['sort']   = 'PRICE';
         $filter['room1']  = '2';
+        
+        $callback = $filter['callback'];
+        unset($filter['callback']);
+        
         
         if (isset($filter['cacheKey']) AND !empty($filter['cacheKey']) AND isset($filter['cacheLocation']) AND !empty($filter['cacheLocation'])) {
             $filter = array(
@@ -63,10 +65,10 @@ class ExpediaController extends Controller {
             }
         }
         
-        $response = Response::make(json_encode($output));
-        $response->header('Content-Type', 'text/json');
+        $response = Response::make( $callback . '(' . json_encode($output) . ');');
+        $response->header('Content-Type', 'text/javascript');
         
-        return json_encode($output);
+        return $response;
     }
     
     
