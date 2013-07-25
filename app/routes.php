@@ -11,6 +11,10 @@
 |
 */
 
+
+Route::controller('expedia', 'ExpediaController');
+
+
 Route::get('/', function()
 {
 	return View::make('hello');
