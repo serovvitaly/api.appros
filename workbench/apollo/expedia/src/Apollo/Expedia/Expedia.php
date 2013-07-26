@@ -1,36 +1,14 @@
 <?php namespace Apollo\Expedia;
 
+
+use Illuminate\Support\Facades\Response;
+
 /**
  * 
  */
 class Expedia {
     
     protected static $_instatce = NULL;
-    
-    protected $_filter = array();
-    
-    /**
-    * Содержит результат
-    */
-    protected $_result = array();
-     
-    /**
-    * Содержит дополнительные данные результата запроса
-    */
-    protected $_addition = array();
-    
-    /**
-    * Содержит список ошибок
-    */
-    protected $_errors = array();
-    
-    /**
-    * Содержит общие параметры API Expedia
-    */
-    protected $_params = array();
-    
-    
-    public $net_result = NULL;  // TODO: тестовый вариант, потом удалить
     
     
     /**
@@ -43,6 +21,12 @@ class Expedia {
         }
         
         return static::$_instatce;
+    }
+    
+    
+    public static function init(array $data)
+    {
+        static::set($data);
     }
     
     
@@ -64,19 +48,40 @@ class Expedia {
     }
     
     
-    /**
-    * Устанавливает параметры фильтрации
-    * 
-    * @param mixed $filter
-    * @return Expedia
-    */
-    public static function filter(array $filter)
-    {
-        if (count($filter) > 0) {
-            static::inst()->_filter = $filter;
+    public static function make($request, $data, $callback = null)
+    {   
+        $output['success'] = false;
+        $output['errors']  = array();
+        
+        $request_class = "Apollo\\Expedia\\Exp\\{$request}";
+        
+        $response = new $request_class(static::inst()->_params);
+        
+        $response->sets($data);
+        
+        $response->execute();
+        
+        if ($response->check_errors()) {
+            $output['errors']  = array_merge(static::inst()->_errors, $response->errors());
+            $output['result']  = NULL;
+        }
+        else {
+            $output['success'] = true;
+            $output['result']  = $response;
         }
         
-        return static::inst();
+        //$output['errors']   = Expedia::errors();
+        //$output['addition'] = Expedia::addition();
+        //$output['data']     = json_decode(Expedia::inst()->net_result);
+        
+        if (empty($callback)) {
+            $callback = $request;
+        }
+        
+        $response = Response::make( $callback . '(' . json_encode($output) . ');');
+        $response->header('Content-Type', 'text/javascript');
+        
+        return $response;
     }
     
     
@@ -128,49 +133,9 @@ class Expedia {
     }
     
     
-    /**
-    * Возвращает результат поиска из кэша, не вошедший в первую выдачу - для пагинации
-    * 
-    */
-    public static function cache()
-    {
-        $self = static::inst();
-        
-        $_result = $self->_query('http://api.ean.com/ean-services/rs/hotel/v3/list', $self->_filter);
-        
-        return $_result;
-    }
     
     
-    /**
-    * Выполняет запрос подробной информации об отеле
-    * 
-    */
-    public static function hotel_info($data)
-    {
-        if ($data['hotelId'] < 1) {
-            return false;
-        }
-        
-        $self = static::inst();
-        
-        $_result = $self->_query('http://api.ean.com/ean-services/rs/hotel/v3/info', $data);
-        
-        if ($_result AND isset($_result->HotelInformationResponse)) {
-            
-            $_result = $_result->HotelInformationResponse;
-            
-            $data['includeRoomImages'] = true;
-            $_result = (object) array_merge((array) $_result, array('HotelRoomAvailabilityResponse' => static::rooms($data)));
-            
-            $self->_result = $_result;
-            
-        } else {
-            $self->_set_error('Не удалось выполнить запрос');
-        }
-        
-        return $self->_result;
-    }
+
     
     
     /**
@@ -257,83 +222,7 @@ class Expedia {
     }
     
     
-    /**
-    * Выполняет запрос к серверу API Expedia
-    * 
-    * @param mixed $url
-    * @param mixed $fields
-    * @param resource $curl
-    * @param mixed $post
-    * @return Expedia
-    */
-    protected function _query($url, array $fields, $curl = false, $post = false)
-    {
-        $url = trim($url, '?');
-        
-        $_post_fields = array_merge($this->_params, $fields);
-        
-        $_fields = array();
-        foreach ($_post_fields AS $f_key => $f_value) {
-            if (is_array($f_value)) {
-                $f_value = implode(',', $f_value);
-            }
-            $_fields[] = $f_key . '=' . $f_value; 
-        }
-        $_fields = implode('&', $_fields);
-        
-        $_result = $this->_result;
-        
-        if ($curl) {
-            $curl = curl_init();
-            
-            curl_setopt_array($curl, array(
-                CURLOPT_URL            => $url,
-                CURLOPT_POST           => $post,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POSTFIELDS     => $_post_fields,
-            ));
-            
-            $response = curl_exec($curl);
-            
-            
-            $info = curl_getinfo($curl);
-            
-            if ($info['http_code'] != 200) {
-                $this->_set_error('Response code - ' . $info['http_code'], 1000);
-            }
-            else {
-                $_result = $response;
-            }
-            //print_r(curl_errno($curl));
-            //print_r(curl_error($curl));
-            
-        } else {
-            try{
-                if ($post === true) {
-                    $context = stream_context_create(array(
-                        'http' => array(
-                            'method' => 'POST',
-                            'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL,
-                            'content' => $_fields,
-                        ),
-                    ));
-                    
-                    $_result = file_get_contents($url, false, $context);
-                    
-                } else {
-                    $_result = file_get_contents($url . '?' . $_fields);
-                }
-                
-            }
-            catch (Exception $e) {
-                $this->_set_error($e->message, $e->code);
-            }
-            
-        }
-        $this->net_result = $_result; // TODO: тестовый вариант, потом удалить
-        
-        return json_decode($_result);
-    }
+
     
     
     /**
