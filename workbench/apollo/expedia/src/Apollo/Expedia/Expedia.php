@@ -53,7 +53,7 @@ class Expedia {
         $output['success'] = false;
         $output['errors']  = array();
         
-        $request_class = "Apollo\\Expedia\\Exp\\{$request}";
+        $request_class = "Apollo\\Expedia\\Request\\{$request}";
         
         $response = new $request_class(static::inst()->_params);
         
@@ -84,84 +84,6 @@ class Expedia {
         return $response;
     }
     
-    
-    /**
-    * Выполняет поисковый запрос
-    * 
-    */
-    public static function search()
-    {
-        $self = static::inst();
-        
-        $_result = $self->_query('http://api.ean.com/ean-services/rs/hotel/v3/list', $self->_filter);
-        
-        if ($_result AND isset($_result->HotelListResponse)) {
-            if (isset($_result->HotelListResponse->EanWsError)) {
-                $self->_set_error($_result->HotelListResponse->EanWsError->verboseMessage);
-            }
-            elseif (isset($_result->HotelListResponse->HotelList)) {
-                $hotellist = $_result->HotelListResponse->HotelList->HotelSummary;
-                $hotellist_array = (array) $_result->HotelListResponse->HotelList;
-                
-                if (count($hotellist) > 0) {
-                    $self->_result = $hotellist;
-                    
-                    // устанавливаем флаг, что отелей больше чем в результате запроса и нужно выводить пагинатор
-                    if (isset($_result->HotelListResponse->moreResultsAvailable)) {
-                        $self->_addition['moreResultsAvailable'] = $_result->HotelListResponse->moreResultsAvailable;
-                    }
-                    
-                    // указываем общее количество найденных отелей
-                    if (isset($hotellist_array['@activePropertyCount']) AND $hotellist_array['@activePropertyCount'] > 0) {
-                        $self->_addition['activePropertyCount'] = (int) $hotellist_array['@activePropertyCount'];
-                        $self->_addition['cacheKey']      = $_result->HotelListResponse->cacheKey;
-                        $self->_addition['cacheLocation'] = $_result->HotelListResponse->cacheLocation;
-                    }
-                    
-                } else {
-                    $self->_set_error('По данному запросу ничего не найдено');
-                }
-            }
-            else {
-                $self->_set_error('Не удалось получить результат');
-            }
-        } else {
-            $self->_set_error('Не удалось выполнить запрос');
-        }
-        
-        return $self->_result;
-    }
-    
-    
-    
-    
-
-    
-    
-    /**
-    * Выполняет запрос доступных комнатах для указанного отеля
-    * 
-    */
-    public static function rooms($data)
-    {
-        if ($data['hotelId'] < 1) {
-            return false;
-        }
-        
-        $self = static::inst();
-        
-        $_result = $self->_query('http://api.ean.com/ean-services/rs/hotel/v3/avail', $data);
-        
-        if ($_result AND isset($_result->HotelRoomAvailabilityResponse)) {
-            
-            $self->_result = $_result->HotelRoomAvailabilityResponse;
-            
-        } else {
-            $self->_set_error('Не удалось выполнить запрос');
-        }
-        
-        return $self->_result;
-    }
     
     
     /**

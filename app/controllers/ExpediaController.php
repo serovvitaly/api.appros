@@ -43,7 +43,23 @@ class ExpediaController extends Controller {
     {
         $data = Input::all();
                 
-        return Expedia::make('HotelInfo', $data, Input::get('callback'));
+        return Expedia::make('HotelInformation', $data, Input::get('callback'));
+    }
+    
+    
+    /**
+    * Возвращает данные о доступных комнатах для указанного отеля
+    * 
+    */
+    public function getRoomAvailability()
+    {
+        $data = Input::all();
+        
+        $data['includeDetails'] = true;
+        $data['includeRoomImages'] = true;
+        $data['room1'] = '2';
+                
+        return Expedia::make('RoomAvailability', $data, Input::get('callback'));
     }
     
     
