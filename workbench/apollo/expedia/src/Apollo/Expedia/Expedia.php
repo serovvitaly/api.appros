@@ -48,40 +48,39 @@ class Expedia {
     }
     
     
-    public static function make($request, $data, $callback = null)
+    public static function make($action, $data, $callback = null)
     {   
         $output['success'] = false;
         $output['errors']  = array();
         
-        $request_class = "Apollo\\Expedia\\Request\\{$request}";
+        $request_class  = "Apollo\\Expedia\\Request\\{$action}";
+        $response_class = "Apollo\\Expedia\\Response\\{$action}";
         
-        $response = new $request_class(static::inst()->_params);
+        $request = new $request_class(static::inst()->_params);
         
-        $response->sets($data);
+        $request->sets($data);
         
-        $response->execute();
+        $request->execute();
         
-        if ($response->check_errors()) {
-            $output['errors']  = array_merge(static::inst()->_errors, $response->errors());
+        if ($request->check_errors()) {
+            $output['errors']  = array_merge(static::inst()->_errors, $request->errors());
             $output['result']  = NULL;
         }
         else {
-            $output['success'] = true;
-            $output['result']  = $response;
+            if ($request->response() instanceof $response_class) {
+                $output['success'] = true;
+                $output['result']  = $request->response();
+            }
         }
-        
-        //$output['errors']   = Expedia::errors();
-        //$output['addition'] = Expedia::addition();
-        //$output['data']     = json_decode(Expedia::inst()->net_result);
         
         if (empty($callback)) {
-            $callback = $request;
+            $callback = $action;
         }
         
-        $response = Response::make( $callback . '(' . json_encode($output) . ');');
-        $response->header('Content-Type', 'text/javascript');
+        $request = Response::make( $callback . '(' . json_encode($output) . ');');
+        $request->header('Content-Type', 'text/javascript');
         
-        return $response;
+        return $request;
     }
     
     

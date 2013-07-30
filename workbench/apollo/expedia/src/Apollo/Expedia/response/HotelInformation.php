@@ -1,6 +1,6 @@
 <?php namespace Apollo\Expedia\Response;
 
-class HotelInformation extends ExpediaRequest{
+class HotelInformation{
     
     public $hotelId = NULL;       // ID отеля в системе Expedia
     public $name;                 // название отеля
@@ -14,7 +14,7 @@ class HotelInformation extends ExpediaRequest{
     public $lowRate;              // наименьшая цена
     public $highRate;             // наибольшая цена
     public $locationDescription;  // описание местоположения
-    public $images = array();     // картинки
+    public $images    = array();  // картинки
     public $roomtypes = array();  // типы комнат
     public $amenities = array();  // опции отеля
     

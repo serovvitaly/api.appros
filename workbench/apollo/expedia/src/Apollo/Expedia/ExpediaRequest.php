@@ -6,7 +6,9 @@ abstract class ExpediaRequest {
     /**
     * Содержит результат
     */
-    protected $_result = array();
+    protected $_result   = array();
+    
+    protected $_response = NULL;
      
     /**
     * Содержит дополнительные данные результата запроса
@@ -71,6 +73,12 @@ abstract class ExpediaRequest {
         $this->_result = $this->_query($_url, $this->_data);
         
         $this->_handle_result();
+    }
+    
+    
+    public function response()
+    {
+        return $this->_response;
     }
     
     

@@ -10,8 +10,6 @@ class HotelList extends ExpediaRequest{
     
     public $data;
     
-    public $items = array();
-    
     protected function _handle_result()
     {
         $this->data = $this->_result;
@@ -23,6 +21,7 @@ class HotelList extends ExpediaRequest{
             if (isset($hlr->HotelList)) {
                 $hl = $hlr->HotelList;
                 if (isset($hl->HotelSummary) AND is_array($hl->HotelSummary) AND count($hl->HotelSummary) > 0) {
+                    $items = array();
                     foreach ($hl->HotelSummary AS $hs) {
                         $item = array(
                             'hotelId'             => $this->g('hotelId', $hs),
@@ -37,8 +36,17 @@ class HotelList extends ExpediaRequest{
                             'highRate'            => $this->g('highRate', $hs),
                         );
                         
-                        $this->items[] = $item;
+                        $items[] = $item;
                     }
+                    
+                    
+                    $response = new \Apollo\Expedia\Response\HotelList;
+                    
+                    $response->total = count($items);
+                    $response->items = $items;
+                    
+                    $this->_response = $response;
+                    
                 }
             }
             
