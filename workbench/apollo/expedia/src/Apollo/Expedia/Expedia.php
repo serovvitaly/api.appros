@@ -70,6 +70,7 @@ class Expedia {
             if ($request->response() instanceof $response_class) {
                 $output['success'] = true;
                 $output['result']  = $request->response();
+                $output['data']    = json_decode($request->net_result);
             }
         }
         

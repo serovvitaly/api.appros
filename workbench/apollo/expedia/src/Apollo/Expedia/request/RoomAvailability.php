@@ -9,7 +9,6 @@ class RoomAvailability extends ExpediaRequest{
     protected $_request_url = '/ean-services/rs/hotel/v3/avail';
     
     public $data = array();
-    public $rooms = array();
     
     protected function _handle_result()
     {
@@ -24,10 +23,15 @@ class RoomAvailability extends ExpediaRequest{
             }
             
             if (isset($hrar->HotelRoomResponse) AND is_array($hrar->HotelRoomResponse) AND count($hrar->HotelRoomResponse) > 0) {
+                
+                $items = array();
+                
                 foreach ($hrar->HotelRoomResponse AS $room) {
                     
                     $BedTypes  = array();
                     $RateInfos = array();
+                    $rateTotal = 0;
+                    $currencyCode = NULL;
                     
                     if (isset($room->RateInfos) AND isset($room->RateInfos->RateInfo)) {
                         if (is_array($room->RateInfos->RateInfo) AND count($room->RateInfos->RateInfo) > 0) {
@@ -46,6 +50,10 @@ class RoomAvailability extends ExpediaRequest{
                                 
                                 $NightlyRatesPerRoom = array();
                                 
+                                if (isset($cri->NightlyRatesPerRoom)) {
+                                    //
+                                }
+                                
                                 $ChargeableRateInfo = array(
                                     'total'                  => $this->g('@total', $cri),
                                     'currencyCode'           => $this->g('@currencyCode', $cri),
@@ -59,6 +67,7 @@ class RoomAvailability extends ExpediaRequest{
                                 );
                             }
                             
+                            
                             $RateInfos[] = array(
                                 'taxRate'            => $rate->taxRate,
                                 'rateType'           => $rate->rateType,
@@ -68,6 +77,15 @@ class RoomAvailability extends ExpediaRequest{
                                 'currentAllotment'   => $rate->currentAllotment,
                                 'ChargeableRateInfo' => $ChargeableRateInfo,
                             );
+                            
+                            if (isset($RateInfos[0])) {
+                                if (isset($RateInfos[0]['ChargeableRateInfo']['total'])) {
+                                    $rateTotal = $RateInfos[0]['ChargeableRateInfo']['total'];
+                                }
+                                if (isset($RateInfos[0]['ChargeableRateInfo']['currencyCode'])) {
+                                    $currencyCode = $RateInfos[0]['ChargeableRateInfo']['currencyCode'];
+                                }
+                            }
                         }
                     }
                     
@@ -82,10 +100,19 @@ class RoomAvailability extends ExpediaRequest{
                         'rateCode'            => $this->g('rateCode', $room),
                         'BedTypes'            => $BedTypes,
                         'RateInfos'           => $RateInfos,
+                        'rateTotal'           => number_format(($rateTotal), 2),
+                        'currencyCode'        => $currencyCode,
                     );
                     
-                    $this->rooms[] = $item;
+                    $items[] = $item;
                 }
+                
+                $response = new \Apollo\Expedia\Response\RoomAvailability;
+                    
+                $response->total = count($items);
+                $response->items = $items;
+                    
+                $this->_response = $response;
             }
         }
     }

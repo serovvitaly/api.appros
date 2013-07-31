@@ -36,6 +36,8 @@ abstract class ExpediaRequest {
     
     protected $_secure_host = 'https://book.api.ean.com';
     
+    public $net_result = '';
+    
     
     /**
     * 
@@ -207,7 +209,7 @@ abstract class ExpediaRequest {
             }
             
         }
-        //$this->net_result = $_result; // TODO: тестовый вариант, потом удалить
+        $this->net_result = $_result; // TODO: тестовый вариант, потом удалить
         
         return json_decode($_result);
     }

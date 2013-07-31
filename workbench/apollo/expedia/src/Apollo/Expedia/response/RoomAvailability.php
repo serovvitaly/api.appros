@@ -1,4 +1,4 @@
-<?php namespace Apollo\Expedia\Request;
+<?php namespace Apollo\Expedia\Response;
 
 class RoomAvailability{
     
