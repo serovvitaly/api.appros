@@ -4,7 +4,7 @@ use Apollo\Expedia\ExpediaRequest;
 
 class HotelList extends ExpediaRequest{
     
-    protected $_allowed_fields = array('city','arrivalDate','departureDate','minStarRating','maxStarRating','numberOfBedRooms','paging','cacheKey','cacheLocation','sort','room1');
+    protected $_allowed_fields = array('city', 'numberOfResults', 'arrivalDate','departureDate','minStarRating','maxStarRating','numberOfBedRooms','paging','cacheKey','cacheLocation','sort','room1');
     
     protected $_request_url = '/ean-services/rs/hotel/v3/list';
     

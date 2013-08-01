@@ -115,6 +115,24 @@ abstract class ExpediaRequest {
     abstract protected function _handle_result();
     
     
+    public function gmix($mix)
+    {
+        $output = array();
+        
+        if (is_array($mix) AND count($mix) > 0) {
+            foreach ($mix AS $item) {
+                //
+            }
+            $output = $mix;
+        }
+        elseif (is_object($mix)) {
+            $output[] = $mix;
+        }
+        
+        return $output;
+    }
+    
+    
     /**
     * Хелпер. Проверяет, есть ли в массиве (объекте) параметр и возвращает его, иначе возвращает дефултовое значение
     * 

@@ -46,12 +46,12 @@ class RoomAvailability extends ExpediaRequest{
                             
                             
                             if (isset($rate->ChargeableRateInfo)) {
-                                $cri = (array) $rate->ChargeableRateInfo;
+                                $cri = $rate->ChargeableRateInfo;
                                 
                                 $NightlyRatesPerRoom = array();
                                 
-                                if (isset($cri->NightlyRatesPerRoom)) {
-                                    //
+                                if (isset($cri->NightlyRatesPerRoom) AND isset($cri->NightlyRatesPerRoom->NightlyRate)) {
+                                    $NightlyRatesPerRoom = $this->gmix($cri->NightlyRatesPerRoom->NightlyRate);
                                 }
                                 
                                 $ChargeableRateInfo = array(
@@ -69,12 +69,13 @@ class RoomAvailability extends ExpediaRequest{
                             
                             
                             $RateInfos[] = array(
-                                'taxRate'            => $rate->taxRate,
-                                'rateType'           => $rate->rateType,
-                                'nonRefundable'      => $rate->nonRefundable,
-                                'guaranteeRequired'  => $rate->guaranteeRequired,
-                                'depositRequired'    => $rate->depositRequired,
-                                'currentAllotment'   => $rate->currentAllotment,
+                                'taxRate'            => $this->g('taxRate', $rate),
+                                'rateType'           => $this->g('rateType', $rate),
+                                'nonRefundable'      => $this->g('nonRefundable', $rate),
+                                'guaranteeRequired'  => $this->g('guaranteeRequired', $rate),
+                                'depositRequired'    => $this->g('depositRequired', $rate),
+                                'currentAllotment'   => $this->g('currentAllotment', $rate),
+                                'cancellationPolicy' => $this->g('cancellationPolicy', $rate),
                                 'ChargeableRateInfo' => $ChargeableRateInfo,
                             );
                             

@@ -24,12 +24,13 @@ class ExpediaController extends Controller {
     */
     public function getSearch()
     {                  
-        Expedia::set('numberOfResults', 20);
+        Expedia::set('numberOfResults', 21);
         
         $filter = Input::all();
         
         $filter['sort']   = 'PRICE';
         $filter['room1']  = '2';
+        $filter['room2']  = '1';
         
         return Expedia::make('HotelList', $filter, Input::get('callback'));
     }
