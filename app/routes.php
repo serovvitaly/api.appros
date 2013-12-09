@@ -18,4 +18,6 @@ Route::get('/', function()
 
 //Route::get('tours', array('uses' => 'ToursController'));
 
+Route::controller('call', 'CallController');
+
 Route::controller('tours', 'ToursController');
