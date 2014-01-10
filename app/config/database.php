@@ -82,6 +82,15 @@ return array(
 			'password' => '',
 			'prefix'   => '',
 		),
+        
+        'mongodb' => array(
+            'driver'   => 'mongodb',
+            'host'     => 'localhost',
+            'port'     => 27017,
+            'username' => '',
+            'password' => '',
+            'database' => 'api_tours'
+        ),
 
 	),
 
@@ -120,5 +129,14 @@ return array(
 		),
 
 	),
+    
+    'mongodb' => array(
+        'driver'   => 'mongodb',
+        'host'     => 'localhost',
+        'port'     => 27017,
+        'username' => '',
+        'password' => '',
+        'database' => 'api_tours'
+    ),
 
 );

@@ -1,6 +1,8 @@
 <?php
 
-class Provider extends Eloquent {
+class Provider extends Model{
+    
+    protected $collection = 'mycollection';
 
     /**
     * Возвращает коллекцию статических данных.

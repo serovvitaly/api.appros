@@ -14,6 +14,8 @@
 
 Route::controller('tours', 'ToursController');
 
+Route::controller('admin', 'Admin\AdminController');
+
 Route::controller('expedia', 'ExpediaController');
 
 Route::get('/', function()

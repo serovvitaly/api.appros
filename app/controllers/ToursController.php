@@ -1,20 +1,26 @@
 <?php
 
-class ToursController extends \BaseController {
+class ToursController extends \ApiController {
     
     /**
      * 
      */
     public function getIndex()
-    {
-        //
+    {        
+        //return 'README.md';
+    }
+    
+    
+    public function anyList()
+    {         
+        $this->result = Offer::all()->toEmbedsArray();
     }
     
     
 	/**
 	 * 
 	 */
-	public function anyList()
+	public function anyList2()
 	{
         header('Content-Type: text/plain; charset=UTF-8');
         
