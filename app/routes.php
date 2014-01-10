@@ -11,6 +11,8 @@
 |
 */
 
+Route::controller('tours', 'ToursController');
+
 Route::get('/', function()
 {
 	return View::make('hello');
@@ -19,5 +21,3 @@ Route::get('/', function()
 //Route::get('tours', array('uses' => 'ToursController'));
 
 Route::controller('call', 'CallController');
-
-Route::controller('tours', 'ToursController');
