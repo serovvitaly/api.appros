@@ -11,7 +11,10 @@
 |
 */
 
+
 Route::controller('tours', 'ToursController');
+
+Route::controller('expedia', 'ExpediaController');
 
 Route::get('/', function()
 {

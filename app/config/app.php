@@ -179,7 +179,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
         'View'            => 'Illuminate\Support\Facades\View',
 		'ProDriver'       => 'Appros\ProDriver\ProDriverServiceProvider',
-
+        'Expedia'         => 'Apollo\Expedia\Expedia',
 	),
 
 );
